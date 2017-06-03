@@ -1,5 +1,6 @@
 const mongo = require('mongoskin')
-const db = mongo.db('mongodb://localhost:27017/ltcs')
+// const db = mongo.db('mongodb://localhost:27017/ltcs')
+const db = mongo.db('mongodb://pass:pass@ds139791.mlab.com:39791/ltcs-todo')
 db.bind('users')
 
 exports.list = function () {

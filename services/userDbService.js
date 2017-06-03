@@ -1,5 +1,6 @@
 const mongo = require('mongoskin')
-const db = mongo.db('mongodb://localhost:27017/ltcs')
+// const db = mongo.db('mongodb://localhost:27017/ltcs')
+const db = mongo.db('mongodb://user:pass@ds139791.mlab.com:39791/ltcs-todo')
 db.bind('users')
 
 exports.list = function (callback) {
@@ -16,11 +17,22 @@ exports.detail = function (id, callback) {
   })
 }
 
+exports.findOneByEmail = function (email, callback) {
+  db.users.findOne({email: email}, (err, user) => {
+    callback(err, user)
+  })
+}
+
 exports.create = function (user, callback) {
+  delete user.confirmPassword
+  user.created = new Date()
+  user.role = 'Guest'
+
   db.users.insertOne(user, (err, res) => {
-    if (err) return console.error('Failed to insert a document into DB', err)
-    if (res.result.n !== 1) return console.error('No data inserted')
-    callback(res.ops[0]._id)
+    if (err) {
+      return callback(err)
+    }
+    callback(null, res.ops[0]._id)
   })
 }
 

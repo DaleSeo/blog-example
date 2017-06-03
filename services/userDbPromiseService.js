@@ -1,6 +1,7 @@
 const MongoClient = require('mongodb').MongoClient
 const ObjectID = require('mongoskin').ObjectID
-const url = 'mongodb://localhost:27017/ltcs'
+// const db = mongo.db('mongodb://localhost:27017/ltcs')
+const db = mongo.db('mongodb://pass:pass@ds139791.mlab.com:39791/ltcs-todo')
 
 exports.list = function () {
   return MongoClient.connect(url)
