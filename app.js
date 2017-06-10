@@ -2,8 +2,9 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const logger = require('morgan')
-const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
+// const cookieParser = require('cookie-parser')
+const session = require('express-session')
 const multer = require('multer')
 const upload = multer({dest: 'uploads/'})
 
@@ -15,10 +16,14 @@ const app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
-app.use(cookieParser())
-
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
+// app.use(cookieParser())
+app.use(session({
+  secret: 'e0e51ad0-f712-4b0c-a56d-73642d1ed279',
+  resave: true,
+  saveUninitialized: true
+}))
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
@@ -28,10 +33,12 @@ const publicUrls = ['/login', '/signup', '/']
 
 app.use((req, res, next) => {
   console.log('#cookies:', req.cookies)
+  console.log('#session:', req.session)
   if (publicUrls.indexOf(req.url) > -1) {
     return next()
   }
-  if (req.cookies.user) {
+  // if (req.cookies.user) {
+  if (req.session.user) {
     return next()
   }
   res.redirect('/login')
@@ -46,7 +53,7 @@ const newUser = {
 }
 
 app.get('/', (req, res) => {
-  res.render('home')
+  res.render('home', {user: req.session.user})
 })
 
 app.get('/test', (req, res) => {
@@ -149,17 +156,23 @@ app.post('/login', (req, res) => {
       return res.render('login', { error: 'Incorrect Password' })
     }
 
-    res.cookie('user', user) // make a cookie for user
+    // res.cookie('user', user) // make a cookie for user
+    req.session.user = user
 
     res.redirect('/')
   })
 })
 
 app.get('/logout', (req, res) => {
-  res.clearCookie('user')
-  res.redirect('/login')
+  // res.clearCookie('user')
+  // res.redirect('/')
+  req.session.destroy(err => {
+    if (err) return console.error(err)
+    res.redirect('/')
+  })
 })
 
-app.listen(3000, () => {
-  console.log('Express server running on port 3000')
+let port = process.env.PORT || 3000
+app.listen(port, () => {
+  console.log('Express server running on port ' + port)
 })

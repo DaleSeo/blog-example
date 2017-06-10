@@ -16,6 +16,7 @@
     "cookie-parser": "^1.4.3",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
+    "express-session": "^1.15.3",
     "hogan": "^1.0.2",
     "mongodb": "^2.2.25",
     "mongoskin": "^2.1.0",
